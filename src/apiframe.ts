@@ -7,16 +7,18 @@ const initFrame = (channleName: string) => {
 
     bc.onmessage = (event: MessageEvent<Payload>) => {
         if (event.data.topic === channleName) {
-            console.log(event);
             window.parent.postMessage(event.data);
         }
     }
 
     window.addEventListener('message', (event: MessageEvent<Payload>) => {
-        if (event.data.topic === channleName) {
-            console.log(event);
-            console.log(event);
-            bc.postMessage(event.data);
+        const referrer = new URL(document.referrer);
+        if (event.origin === referrer.origin) {
+            if (event.data.topic === channleName) {
+                bc.postMessage(event.data);
+            }
+        } else {
+            console.warn('ignoring message form', document.referrer);
         }
     });
 }

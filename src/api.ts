@@ -27,7 +27,7 @@ const api = (iframe: HTMLIFrameElement, config: Config) => {
     window.addEventListener('message', (event: MessageEvent<Payload>) => {
         if (config.allowedOrigins.includes(event.data.origin)) {
             if (event.data.topic === config.topic) {
-                config.onmessage({ topic: event.data.topic, data: event.data.data, origin: event.origin });
+                config.onmessage( event.data );
             }
         } else {
             console.warn('message not allowed from', event.data.origin);
@@ -35,7 +35,7 @@ const api = (iframe: HTMLIFrameElement, config: Config) => {
     });
 
     return {
-        send: (payload: Payload) => {
+        send: (payload: any) => {
             iframe.contentWindow?.postMessage({ topic: config.topic, data: payload }, APIFrameUrl );
         }
     }    

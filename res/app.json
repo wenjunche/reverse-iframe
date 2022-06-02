@@ -1,0 +1,29 @@
+{
+    "devtools_port": 9090,
+    "licenseKey": "openfin-demo-license-key",
+    "runtime": {
+      "arguments": "--v=1",
+      "version": "stable"
+    },
+    "startup_app": {
+        "uuid": "reverse-iframe",
+        "icon": "{APP_ROOT_URL}/favicon.ico",
+        "url": "https://openfin.co",
+        "autoShow": true,
+        "defaultHeight": 400,
+        "defaultWidth": 400,
+        "resizable": true,
+        "defaultCentered": true,
+        "contextMenuSettings": {
+            "enable": true,
+            "devtools": true,
+            "reload": true
+        },
+        "preload": [
+            {
+              "url": "{APP_PRELOAD_URL}/preload-bundle.js"
+            }
+          ]
+      
+    }
+}

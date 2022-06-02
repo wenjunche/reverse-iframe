@@ -1,24 +1,31 @@
 
 import { Payload } from './api';
 
+const getParentOrigin = () => {
+    return !!document.referrer ? document.referrer : location.ancestorOrigins[0];
+}
+
 const initFrame = (channleName: string) => {
 
     const bc = new BroadcastChannel(channleName);
 
     bc.onmessage = (event: MessageEvent<Payload>) => {
         if (event.data.topic === channleName) {
-            window.parent.postMessage(event.data, document.referrer);
+            console.log('BroadcastChannel got', event.data);
+            window.parent.postMessage(event.data, getParentOrigin());
         }
     }
 
     window.addEventListener('message', (event: MessageEvent<Payload>) => {
-        const referrer = new URL(document.referrer);
+        const referrer = new URL(getParentOrigin());
         if (event.origin === referrer.origin) {
             if (event.data.topic === channleName) {
-                bc.postMessage({...event.data, origin: event.origin } );
+                const msg = { ...event.data, origin: event.origin };
+                console.log('BroadcastChannel forwarding', msg);
+                bc.postMessage(msg);
             }
         } else {
-            console.warn('apiframe ignoring message from', document.referrer);
+            console.warn('apiframe ignoring message from', event.origin);
         }
     });
 }

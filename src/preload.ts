@@ -6,10 +6,10 @@ const onmessage = (message: Payload) => {
 }
 
 window.addEventListener("DOMContentLoaded",  async () => {
-
+    console.log('preload', location.href);
     init({
-        topic: 'bigw', 
-        allowedOrigins: ['http://localhost:8081', 'https://openfin.co', 'https://www.openfin.co', 'https://example.com'],
+        topic: 'iFrameRules', 
+        allowedOrigins: ['http://localhost:8081', 'https://example.com', 'https://openfin.co' ],
         onmessage
      });
 

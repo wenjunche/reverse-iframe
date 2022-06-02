@@ -8,7 +8,7 @@ const onmessage = (message: Payload) => {
 window.addEventListener("DOMContentLoaded",  async () => {
 
     init({
-        topic: 'bigw', 
+        topic: 'iFrameRules', 
         allowedOrigins: ['http://localhost:8081', 'https://openfin.co', 'https://www.openfin.co', 'https://example.com'],
         onmessage
      });

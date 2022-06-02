@@ -6,7 +6,8 @@
     "types": "./types/index.d.ts",
     "scripts": {
         "clean": "rimraf ./dist",
-        "build": "npm run clean && tsc && npx webpack --env mode=production",
+        "build": "tsc && npx webpack --env mode=production",
+        "build:dev": "tsc && npx webpack --env mode=development",
         "deploy:npm": "cd dist && npm publish",
         "deploy": "npm run deploy:npm",
         "start": "webpack-dev-server --env mode=development"

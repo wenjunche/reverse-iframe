@@ -1,7 +1,7 @@
 
-import { init } from './api'
+import { init, Payload } from './api'
 
-const onmessage = (message) => {
+const onmessage = (message: Payload) => {
     console.log('got message', message);
 }
 

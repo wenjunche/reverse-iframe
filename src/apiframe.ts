@@ -7,7 +7,7 @@ const initFrame = (channleName: string) => {
 
     bc.onmessage = (event: MessageEvent<Payload>) => {
         if (event.data.topic === channleName) {
-            window.parent.postMessage(event.data);
+            window.parent.postMessage(event.data, document.referrer);
         }
     }
 
@@ -15,10 +15,10 @@ const initFrame = (channleName: string) => {
         const referrer = new URL(document.referrer);
         if (event.origin === referrer.origin) {
             if (event.data.topic === channleName) {
-                bc.postMessage(event.data);
+                bc.postMessage({...event.data, origin: event.origin } );
             }
         } else {
-            console.warn('ignoring message form', document.referrer);
+            console.warn('apiframe ignoring message from', document.referrer);
         }
     });
 }

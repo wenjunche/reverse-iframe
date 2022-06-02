@@ -6,7 +6,7 @@ iframe that is reversed
 import { init, Payload } from './api'
 
 const onmessage = (message: Payload) => {
-    console.log('got message', message);
+    console.log('got data', message.data, ' from ', message.origin);
 }
 
 window.addEventListener("DOMContentLoaded",  async () => {

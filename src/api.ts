@@ -1,5 +1,6 @@
+declare const APP_PRELOAD_URL: string;
 
-const APIFrameUrl = 'http://localhost:8082/apiframe.html';
+const APIFrameUrl = `${APP_PRELOAD_URL}/apiframe.html`;
 
 export interface Payload {
     topic: string;

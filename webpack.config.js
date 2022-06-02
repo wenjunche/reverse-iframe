@@ -8,20 +8,22 @@ const CopyPlugin = require("copy-webpack-plugin");
 const isDevServer = process.env.WEBPACK_SERVE;   // if in dev-server mode
 const localPort = 8081;
 const localUrl = `http://localhost:${localPort}`;
-const removeUrl = 'https://testing-assets.openfin.co/reverseiframe';
-let   preloadUrl = `http://localhost:${localPort+1}`;
+const remoteUrl = 'https://testing-assets.openfin.co/reverseiframe';
+let   preloadUrl = `http://localhost:${localPort}`;
 
 let definePlugin, rootUrl;
 if (!isDevServer) {
-    rootUrl = removeUrl;
-    preloadUrl = removeUrl;
+    rootUrl = remoteUrl;
+    preloadUrl = remoteUrl;
     definePlugin = new webpack.DefinePlugin({
-        APP_ROOT_URL: JSON.stringify(removeUrl)
+        APP_ROOT_URL: JSON.stringify(remoteUrl),
+        APP_PRELOAD_URL: JSON.stringify(remoteUrl)
     });
 } else {
     rootUrl = localUrl;
     definePlugin = new webpack.DefinePlugin({
-        APP_ROOT_URL: JSON.stringify(localUrl)
+        APP_ROOT_URL: JSON.stringify(localUrl),
+        APP_PRELOAD_URL: JSON.stringify(localUrl)
     });
 }
 
@@ -48,7 +50,8 @@ module.exports = (env) => {
     devtool: env.mode === 'development' ? 'source-map' : undefined,
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: '[name]-bundle.js'
+        filename: '[name]-bundle.js',
+        publicPath: ''  // workaround for some weird issue with webpack
     },
     module: {
         rules: [
@@ -82,9 +85,10 @@ module.exports = (env) => {
         definePlugin
     ],
     devServer: {
-        static : {
-            directory : path.join(__dirname, 'res')
-        },
+        static : [
+            { directory : path.join(__dirname, 'res')},
+            { directory : path.join(__dirname, 'dist')}
+        ],
         port: localPort,
         hot: true,
         setupMiddlewares: (middlewares, devServer) => {

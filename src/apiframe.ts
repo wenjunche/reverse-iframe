@@ -10,7 +10,7 @@ const initFrame = (channleName: string) => {
     const bc = new BroadcastChannel(channleName);
 
     bc.onmessage = (event: MessageEvent<Payload>) => {
-        if (event.data.topic === channleName) {
+        if (event.data.channel === channleName) {
             console.log('BroadcastChannel got', event.data);
             window.parent.postMessage(event.data, getParentOrigin());
         }
@@ -19,7 +19,7 @@ const initFrame = (channleName: string) => {
     window.addEventListener('message', (event: MessageEvent<Payload>) => {
         const referrer = new URL(getParentOrigin());
         if (event.origin === referrer.origin) {
-            if (event.data.topic === channleName) {
+            if (event.data.channel === channleName) {
                 const msg = { ...event.data, origin: event.origin };
                 console.log('BroadcastChannel forwarding', msg);
                 bc.postMessage(msg);
@@ -32,9 +32,9 @@ const initFrame = (channleName: string) => {
 
 window.addEventListener("DOMContentLoaded",  async () => {
     const queries = new URLSearchParams(window.location.search);
-    const topic = queries.get('topic');
-    if (topic) {
-        initFrame(topic);
+    const channel = queries.get('channel');
+    if (channel) {
+        initFrame(channel);
     } else {
         console.error('missing topc query parameter for api iframe');
     }

@@ -8,7 +8,8 @@ const onmessage = (message: Payload) => {
 window.addEventListener("DOMContentLoaded",  async () => {
     console.log('preload', location.href);
     init({
-        topic: 'iFrameRules', 
+        uuid: crypto.randomUUID(),
+        channel: 'iFrameRules', 
         allowedOrigins: ['http://localhost:8081', 'https://example.com', 'https://openfin.co', 'https://www.openfin.co' ],
         onmessage
      });

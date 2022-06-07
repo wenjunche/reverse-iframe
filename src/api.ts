@@ -3,19 +3,21 @@ declare const APP_PRELOAD_URL: string;
 const APIFrameUrl = `${APP_PRELOAD_URL}/apiframe.html`;
 
 export interface Payload {
-    topic: string;
-    origin: string;
+    channel: string;
+    origin: string;     // origin of source
+    source: string;     // souce UUID
     data: any;
 }
 
 export interface Config {
-    topic: string;
+    uuid: string;           // id of this connection
+    channel: string;
     allowedOrigins: string[];
     onmessage: (message: Payload) => void;
 }
 
 export interface Fin {
-    send: (payload: Payload) => void;
+    send: (payload: any) => void;
 }
 
 declare global {
@@ -27,7 +29,7 @@ declare global {
 const api = (iframe: HTMLIFrameElement, config: Config) => {
     window.addEventListener('message', (event: MessageEvent<Payload>) => {
         if (config.allowedOrigins.includes(event.data.origin)) {
-            if (event.data.topic === config.topic) {
+            if (event.data.channel === config.channel) {
                 config.onmessage( event.data );
             }
         } else {
@@ -37,16 +39,17 @@ const api = (iframe: HTMLIFrameElement, config: Config) => {
 
     return {
         send: (payload: any) => {
-            iframe.contentWindow?.postMessage({ topic: config.topic, data: payload }, APIFrameUrl );
+            iframe.contentWindow?.postMessage({ channel: config.channel, data: payload, source: config.uuid }, APIFrameUrl );
         }
     }    
 }
 
 export const init = (config: Config) => {
     const ifrm = document.createElement("IFRAME") as HTMLIFrameElement;
-    ifrm.setAttribute("src", `${APIFrameUrl}?topic=${config.topic}`);
+    ifrm.setAttribute("src", `${APIFrameUrl}?channel=${config.channel}`);
     ifrm.style.width = '0px';
     ifrm.style.height = '0px';
+    ifrm.style.display = 'none';
     document.body.appendChild(ifrm);
     window.finfin = api(ifrm, config);
 };

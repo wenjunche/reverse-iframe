@@ -8,7 +8,8 @@ const onmessage = (message: Payload) => {
 window.addEventListener("DOMContentLoaded",  async () => {
 
     init({
-        topic: 'iFrameRules',   // topic or channel name
+        uuid: crypto.randomUUID(),
+        channel: 'iFrameRules',   //  channel name
         allowedOrigins: ['http://localhost:8081', 'https://openfin.co', 'https://www.openfin.co', 'https://example.com'],  // allowed to send messages
         onmessage  // onmessage call back
      });

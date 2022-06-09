@@ -31,7 +31,7 @@ window.addEventListener("DOMContentLoaded",  async () => {
 
 ## Test with OpenFin Runtime
 
-This API does not require Runtime, but the example injects API as preload script to any website.
+This API does not require Runtime, but the example injects the API with a preload script to any website.
 
 1. npm run build
 2. npm run start

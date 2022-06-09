@@ -1,8 +1,12 @@
 
-import { init, Payload } from './api'
+import { init, ApplicationMessage, ChannelEvent } from './api'
 
-const onmessage = (message: Payload) => {
+const onmessage = (message: ApplicationMessage) => {
     console.log('got message', message);
+}
+
+const onChannelEvent = (message: ChannelEvent) => {
+    console.log('got channel event', message );
 }
 
 window.addEventListener("DOMContentLoaded",  async () => {
@@ -10,8 +14,9 @@ window.addEventListener("DOMContentLoaded",  async () => {
     init({
         uuid: crypto.randomUUID(),
         channel: 'iFrameRules', 
-        allowedOrigins: ['http://localhost:8081', 'https://example.com', 'https://openfin.co', 'https://www.openfin.co' ],
-        onmessage
+        allowedOrigins: ['http://localhost:8081', 'https://example.com', 'https://openfin.co', 'https://www.openfin.co', 'https://finjs.com/' ],
+        onmessage,
+        onChannelEvent
      });
 
 });

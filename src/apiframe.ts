@@ -1,22 +1,21 @@
 
-import { Payload } from './api';
+import { ChannelEvent, ApplicationMessage } from './api';
 
 const getParentOrigin = () => {
-    return !!document.referrer ? document.referrer : location.ancestorOrigins[0];
+    return !!document.referrer ? document.referrer : document.location.ancestorOrigins[0];
 }
 
 const initFrame = (channleName: string) => {
 
     const bc = new BroadcastChannel(channleName);
 
-    bc.onmessage = (event: MessageEvent<Payload>) => {
+    bc.onmessage = (event: MessageEvent<ApplicationMessage>) => {
         if (event.data.channel === channleName) {
-            console.log('BroadcastChannel got', event.data);
-            window.parent.postMessage(event.data, getParentOrigin());
+            postToParent(event.data);
         }
     }
 
-    window.addEventListener('message', (event: MessageEvent<Payload>) => {
+    window.addEventListener('message', (event: MessageEvent<ApplicationMessage>) => {
         const referrer = new URL(getParentOrigin());
         if (event.origin === referrer.origin) {
             if (event.data.channel === channleName) {
@@ -30,9 +29,30 @@ const initFrame = (channleName: string) => {
     });
 }
 
+const postToParent = (data: any) => {
+    window.parent.postMessage(data, getParentOrigin());
+}
+
 window.addEventListener("DOMContentLoaded",  async () => {
     const queries = new URLSearchParams(window.location.search);
     const channel = queries.get('channel');
+    const uuid = queries.get('uuid');
+
+    const worker: SharedWorker = new SharedWorker(new URL('./sharedWorker.ts', import.meta.url));
+    worker.port.addEventListener('message', (event: MessageEvent) => {
+        postToParent(event.data );
+    });
+    worker.port.addEventListener('messageerror', (event: MessageEvent) => {
+        console.log('sharedworker error', event);
+    });
+    worker.port.start();
+    worker.port.postMessage({ action: 'JOIN', uuid, channel, origin: getParentOrigin() } as ChannelEvent);
+
+    window.addEventListener('beforeunload', (ev: BeforeUnloadEvent) => {
+        worker.port.postMessage({ action: 'LEAVE', uuid, channel, origin: getParentOrigin() } as ChannelEvent);
+    });
+
+
     if (channel) {
         initFrame(channel);
     } else {

@@ -12,20 +12,6 @@ const remoteUrl = 'https://testing-assets.openfin.co/reverseiframe';
 let   preloadUrl = `http://localhost:${localPort}`;
 
 let definePlugin, rootUrl;
-if (!isDevServer) {
-    rootUrl = remoteUrl;
-    preloadUrl = remoteUrl;
-    definePlugin = new webpack.DefinePlugin({
-        APP_ROOT_URL: JSON.stringify(remoteUrl),
-        APP_PRELOAD_URL: JSON.stringify(remoteUrl)
-    });
-} else {
-    rootUrl = localUrl;
-    definePlugin = new webpack.DefinePlugin({
-        APP_ROOT_URL: JSON.stringify(localUrl),
-        APP_PRELOAD_URL: JSON.stringify(localUrl)
-    });
-}
 
 const copyPlugin = new CopyPlugin({
     patterns: [
@@ -39,13 +25,28 @@ const copyPlugin = new CopyPlugin({
 
 module.exports = (env) => {
     console.log(env.mode);
-
+    if (!isDevServer && env.mode === 'production') {
+        rootUrl = remoteUrl;
+        preloadUrl = remoteUrl;
+        definePlugin = new webpack.DefinePlugin({
+            APP_ROOT_URL: JSON.stringify(remoteUrl),
+            APP_PRELOAD_URL: JSON.stringify(remoteUrl)
+        });
+    } else {
+        rootUrl = localUrl;
+        definePlugin = new webpack.DefinePlugin({
+            APP_ROOT_URL: JSON.stringify(localUrl),
+            APP_PRELOAD_URL: JSON.stringify(localUrl)
+        });
+    }
+    
    return {
     mode: env.mode,
     entry: {
         index: './src/index.ts',
         apiframe: './src/apiframe.ts',
-        preload: './src/preload.ts'
+        preload: './src/preload.ts',
+        sharedWorker: './src/sharedWorker.ts'
     },
     devtool: env.mode === 'development' ? 'source-map' : undefined,
     output: {

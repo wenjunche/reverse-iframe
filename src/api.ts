@@ -2,19 +2,30 @@ declare const APP_PRELOAD_URL: string;
 
 const APIFrameUrl = `${APP_PRELOAD_URL}/apiframe.html`;
 
-export interface Payload {
+export interface ApplicationMessage {
     channel: string;
     origin: string;     // origin of source
     source: string;     // souce UUID
     data: any;
 }
 
+export type ChannelAction = 'JOIN' | 'LEAVE';
+export interface ChannelEvent {
+    action: ChannelAction;
+    uuid: string;
+    origin: string;     // origin of source
+    channel: string;
+}
+
 export interface Config {
     uuid: string;           // id of this connection
     channel: string;
     allowedOrigins: string[];
-    onmessage: (message: Payload) => void;
+    onmessage: (message: ApplicationMessage) => void;
+    onChannelEvent?: (message: ChannelEvent) => void;
 }
+
+type Payload = ApplicationMessage | ChannelEvent;
 
 export interface Fin {
     send: (payload: any) => void;
@@ -28,12 +39,17 @@ declare global {
 
 const api = (iframe: HTMLIFrameElement, config: Config) => {
     window.addEventListener('message', (event: MessageEvent<Payload>) => {
-        if (config.allowedOrigins.includes(event.data.origin)) {
-            if (event.data.channel === config.channel) {
-                config.onmessage( event.data );
+        if (Object.hasOwn(event.data, 'action')) {
+            if (config.onChannelEvent) {
+                config.onChannelEvent(event.data as ChannelEvent);
             }
-        } else {
-            console.warn('message not allowed from', event.data.origin);
+        } 
+        else if (config.allowedOrigins.includes((event.data as ApplicationMessage).origin)) {
+            if (event.data.channel === config.channel) {
+                config.onmessage( event.data as ApplicationMessage);
+            } else {
+                console.warn('message not allowed from', event.data);
+            }
         }
     });
 
@@ -46,7 +62,7 @@ const api = (iframe: HTMLIFrameElement, config: Config) => {
 
 export const init = (config: Config) => {
     const ifrm = document.createElement("IFRAME") as HTMLIFrameElement;
-    ifrm.setAttribute("src", `${APIFrameUrl}?channel=${config.channel}`);
+    ifrm.setAttribute("src", `${APIFrameUrl}?channel=${config.channel}&uuid=${config.uuid}`);
     ifrm.style.width = '0px';
     ifrm.style.height = '0px';
     ifrm.style.display = 'none';

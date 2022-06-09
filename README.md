@@ -5,8 +5,14 @@ iframe that is reversed
 ~~~
 import { init, Payload } from './api'
 
+// message listener
 const onmessage = (message: Payload) => {
     console.log('got data', message.data, ' from ', message.origin);
+}
+
+// channel event listener, called when a member joins or leaves the channel
+const onChannelEvent = (message: ChannelEvent) => {
+    console.log('got channel event', message );
 }
 
 window.addEventListener("DOMContentLoaded",  async () => {
@@ -14,9 +20,12 @@ window.addEventListener("DOMContentLoaded",  async () => {
     init({
         channel: 'iFrameRules',   // channel name
         allowedOrigins: ['http://localhost:8081', 'https://openfin.co', 'https://www.openfin.co', 'https://example.com'],  // allowed to send messages to this app
-        onmessage  // onmessage call back
+        onmessage  // onmessage call back,
+        onChannelEvent // channel event listener
      });
 
+    // sends a message to all members of the channel
+    finfin.send({name: 'OpenFin', location:'NY'});
 });
 ~~~
 
